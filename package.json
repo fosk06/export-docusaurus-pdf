@@ -1,17 +1,17 @@
 {
-  "name": "export-docusaurus-pdf",
-  "version": "1.0.6",
+  "name": "docusaurus-export-pdf",
+  "version": "2.0.0",
   "type": "module",
-  "description": "Export Docusaurus-generated documentation websites to PDF via CLI or Node.js API",
-  "main": "./src/exportToPdfForAll.js",
+  "description": "Export Docusaurus-generated documentation websites to PDF via CLI or Node.js API. Refactored with clean architecture, modular design, and improved error handling.",
+  "main": "./src/index.js",
   "bin": {
     "docexport": "./bin.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/lidppp/export-docusaurus-pdf"
+    "url": "git+https://github.com/fosk06/export-docusaurus-pdf.git"
   },
-  "homepage": "https://github.com/lidppp/export-docusaurus-pdf#readme",
+  "homepage": "https://github.com/fosk06/export-docusaurus-pdf#readme",
   "keywords": [
     "docusaurus",
     "pdf",
@@ -25,7 +25,7 @@
   "engines": {
     "node": ">=16"
   },
-  "author": "lidppp",
+  "author": "Thales",
   "license": "MIT",
   "dependencies": {
     "cac": "^6.7.14",

@@ -1,13 +1,10 @@
-# `export-docusaurus-pdf`
-[![npm](https://img.shields.io/npm/v/export-docusaurus-pdf?color=brightgreen)](https://www.npmjs.com/package/export-docusaurus-pdf)
-[![Node.js](https://img.shields.io/node/v/export-docusaurus-pdf?color=blue)](https://nodejs.org)
-[![License](https://img.shields.io/npm/l/export-docusaurus-pdf)](https://github.com/lidppp/export-docusaurus-pdf/blob/main/LICENSE)
-[![Downloads](https://img.shields.io/npm/dm/export-docusaurus-pdf)](https://www.npmjs.com/package/export-docusaurus-pdf)
-[![GitHub stars](https://img.shields.io/github/stars/lidppp/export-docusaurus-pdf?style=social)](https://github.com/lidppp/export-docusaurus-pdf)  
+# `docusaurus-export-pdf`
 
 A CLI and Node.js tool to export **Docusaurus-generated documentation websites** to PDF.
 
-------
+> **Enhanced version** with improved sidebar handling and better error recovery for complex Docusaurus documentation structures.
+
+---
 
 ## Features
 
@@ -19,23 +16,23 @@ A CLI and Node.js tool to export **Docusaurus-generated documentation websites**
 - URL validation (only `http`/`https`)
 - Automatically creates output directories
 
-------
+---
 
 ## Installation
 
 Globally:
 
 ```
-npm install -g export-docusaurus-pdf
+npm install -g docusaurus-export-pdf
 ```
 
 Locally:
 
 ```
-npm install export-docusaurus-pdf
+npm install docusaurus-export-pdf
 ```
 
-------
+---
 
 ## CLI Usage
 
@@ -73,12 +70,14 @@ Export without cleaning temporary files:
 docexport http://localhost:3000 --no-clean
 ```
 
-------
+---
 
 ## Programmatic Usage
 
+### Basic Usage
+
 ```
-import { run } from 'export-docusaurus-pdf/src/exportToPdfForAll.js';
+import { run } from 'docusaurus-export-pdf';
 
 (async () => {
   const url = 'http://localhost:3000';
@@ -89,20 +88,56 @@ import { run } from 'export-docusaurus-pdf/src/exportToPdfForAll.js';
 })();
 ```
 
+### Advanced Usage with Custom Configuration
+
+```
+import { exportToPdf, defaultConfig } from 'docusaurus-export-pdf';
+
+(async () => {
+  const url = 'http://localhost:3000';
+  const output = './out/docs.pdf';
+
+  const customConfig = {
+    ...defaultConfig,
+    timeouts: {
+      ...defaultConfig.timeouts,
+      pageLoad: 15000,
+    },
+    pdf: {
+      ...defaultConfig.pdf,
+      width: '1200px',
+    },
+  };
+
+  await exportToPdf(url, output, customConfig);
+})();
+```
+
 > **Note:** Only works with Docusaurus-generated documentation. Node.js 16+ is recommended.
 
-------
+---
 
 ## Development
 
 ```
-git clone https://github.com/lidppp/export-docusaurus-pdf.git
+git clone https://github.com/fosk06/export-docusaurus-pdf.git
 cd export-docusaurus-pdf
 npm install
 node ./bin.js http://localhost:3000 -o ./out/dev.pdf
 ```
 
-------
+## Improvements in this version
+
+- ✅ **Improved sidebar handling**: Better detection and expansion of collapsible menu items
+- ✅ **Multiple click strategies**: Uses JavaScript expansion, force clicks, and fallback methods
+- ✅ **Better error recovery**: Continues processing even if some menu items fail
+- ✅ **Enhanced visibility checks**: Verifies element visibility before attempting clicks
+- ✅ **Timeout handling**: More robust timeout management for complex documentation structures
+- ✅ **Refactored codebase**: Clean architecture with separated concerns, better error handling, and structured logging
+- ✅ **Modular design**: Services for sidebar expansion, link collection, PDF export, and merging
+- ✅ **Configuration management**: Centralized configuration with easy customization
+
+---
 
 ## License
 

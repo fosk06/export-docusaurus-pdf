@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { run } from './src/exportToPdfForAll.js'
+import { run } from './src/index.js'
 import cac from "cac";
 import path from 'path';
 import fs from 'fs';
@@ -35,7 +35,7 @@ cli
     const dir = path.dirname(output);
     fs.mkdirSync(dir, { recursive: true });
 
-    run(url, output, options.clean)
+    run(url, output, options.clean !== false)
 
     console.log("Exported to:", output);
   });
