@@ -3,8 +3,12 @@ import { ExportError } from "../utils/errors.js";
 import { LinkCollector } from "./LinkCollector.js";
 import { PdfExporter } from "./PdfExporter.js";
 import { PdfMerger } from "./PdfMerger.js";
-import { createTempDirectory, removeDirectory, resolveOutputPath } from "../utils/fileSystem.js";
-import { info, error } from "../utils/logger.js";
+import {
+  createTempDirectory,
+  removeDirectory,
+  resolveOutputPath,
+} from "../utils/fileSystem.js";
+import { info, error, warn, debug } from "../utils/logger.js";
 
 /**
  * Main service that orchestrates the PDF export process
@@ -87,11 +91,6 @@ export class DocusaurusPdfExporter {
       const pdfMerger = new PdfMerger(this.config);
       await pdfMerger.merge(exportedFiles, fullPath);
 
-      // Step 4: Cleanup temporary files if requested
-      if (this.config.cleanup.cleanTempFiles) {
-        removeDirectory(tempDir);
-      }
-
       return fullPath;
     } catch (err) {
       error("Export failed:", err);
@@ -101,6 +100,19 @@ export class DocusaurusPdfExporter {
       if (this.browser) {
         info("Closing browser...");
         await this.browser.close();
+      }
+
+      // Always cleanup temporary files if they were created
+      if (tempDir && this.config.cleanup.cleanTempFiles) {
+        try {
+          removeDirectory(tempDir);
+          debug(`Cleaned up temporary directory: ${tempDir}`);
+        } catch (cleanupErr) {
+          warn(
+            `Failed to clean up temporary directory ${tempDir}:`,
+            cleanupErr.message
+          );
+        }
       }
     }
   }
