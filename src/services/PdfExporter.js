@@ -67,6 +67,46 @@ export class PdfExporter {
   }
 
   /**
+   * Replace internal links (localhost) - remove href to prevent broken links in PDF
+   * @param {string} baseUrl - Base URL to identify internal links
+   */
+  async replaceInternalLinks(baseUrl) {
+    try {
+      await this.page.evaluate((baseUrl) => {
+        const links = document.querySelectorAll("article a[href]");
+        links.forEach((link) => {
+          const href = link.getAttribute("href");
+          if (!href) return;
+
+          try {
+            // Check if it's an internal link (starts with baseUrl or is relative)
+            const isInternal =
+              href.startsWith(baseUrl) ||
+              href.startsWith("/") ||
+              (!href.startsWith("http") &&
+                !href.startsWith("mailto:") &&
+                !href.startsWith("#"));
+
+            if (isInternal) {
+              // Remove localhost/internal links - they won't work in PDF anyway
+              // Keep the text but remove the link functionality
+              link.removeAttribute("href");
+              link.style.cursor = "default";
+              link.style.textDecoration = "none";
+              link.style.color = "inherit";
+            }
+          } catch (err) {
+            // If URL parsing fails, just remove the href
+            link.removeAttribute("href");
+          }
+        });
+      }, baseUrl);
+    } catch (err) {
+      warn("Failed to replace internal links:", err.message);
+    }
+  }
+
+  /**
    * Extract headings (h1-h6) from the current page
    * @returns {Promise<Array<{level: number, text: string, id: string}>>} Array of headings with their level and text
    */
@@ -103,9 +143,10 @@ export class PdfExporter {
    * Export a single page to PDF
    * @param {string} url - URL of the page to export
    * @param {string} outputPath - Path where to save the PDF
+   * @param {string} baseUrl - Base URL for link replacement
    * @returns {Promise<{path: string, headings: Array}>} Object with path and extracted headings
    */
-  async exportPage(url, outputPath) {
+  async exportPage(url, outputPath, baseUrl) {
     try {
       info(`Exporting page: ${url}`);
       await this.page.goto(url, { waitUntil: "networkidle" });
@@ -113,6 +154,11 @@ export class PdfExporter {
 
       // Apply custom styles
       await this.applyCustomStyles();
+
+      // Replace internal links before export
+      if (baseUrl) {
+        await this.replaceInternalLinks(baseUrl);
+      }
 
       // Check if this is a doc list page (skip it)
       const shouldSkip = await this.isDocListPage();
@@ -149,9 +195,10 @@ export class PdfExporter {
    * Export multiple pages to PDF files
    * @param {string[]} urls - Array of URLs to export
    * @param {string} outputDir - Directory where to save the PDF files
+   * @param {string} baseUrl - Base URL for link replacement
    * @returns {Promise<Array<{path: string, headings: Array, url: string, pageIndex: number}>>} Array of export metadata
    */
-  async exportPages(urls, outputDir) {
+  async exportPages(urls, outputDir, baseUrl) {
     const exportedFiles = [];
     let currentPageIndex = 0;
 
@@ -161,7 +208,7 @@ export class PdfExporter {
       const outputPath = path.join(outputDir, fileName);
 
       try {
-        const result = await this.exportPage(url, outputPath);
+        const result = await this.exportPage(url, outputPath, baseUrl);
         if (result) {
           exportedFiles.push({
             path: result.path,

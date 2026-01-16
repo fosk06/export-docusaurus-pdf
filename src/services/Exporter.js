@@ -81,7 +81,7 @@ export class DocusaurusPdfExporter {
 
       // Step 2: Export each page to PDF
       const pdfExporter = new PdfExporter(this.page, this.config);
-      const exportedFiles = await pdfExporter.exportPages(links, tempDir);
+      const exportedFiles = await pdfExporter.exportPages(links, tempDir, url);
 
       if (exportedFiles.length === 0) {
         throw new ExportError("No pages were successfully exported");
