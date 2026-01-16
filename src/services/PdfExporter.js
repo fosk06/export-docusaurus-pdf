@@ -73,21 +73,26 @@ export class PdfExporter {
   async replaceInternalLinks(baseUrl) {
     try {
       await this.page.evaluate((baseUrl) => {
-        const links = document.querySelectorAll("article a[href]");
+        // Select all links in the document (not just in article, to catch "edit this page" buttons)
+        const links = document.querySelectorAll("a[href]");
         links.forEach((link) => {
           const href = link.getAttribute("href");
           if (!href) return;
 
           try {
-            // Check if it's an internal link (starts with baseUrl or is relative)
-            const isInternal =
+            // Check if it's a localhost link (any localhost variant)
+            const isLocalhost =
+              href.includes("localhost") ||
+              href.includes("127.0.0.1") ||
+              href.includes("git.localhost") ||
               href.startsWith(baseUrl) ||
               href.startsWith("/") ||
               (!href.startsWith("http") &&
                 !href.startsWith("mailto:") &&
-                !href.startsWith("#"));
+                !href.startsWith("#") &&
+                !href.startsWith("javascript:"));
 
-            if (isInternal) {
+            if (isLocalhost) {
               // Remove localhost/internal links - they won't work in PDF anyway
               // Keep the text but remove the link functionality
               link.removeAttribute("href");
