@@ -1,6 +1,6 @@
 {
   "name": "docusaurus-export-pdf",
-  "version": "2.2.1",
+  "version": "2.3.0",
   "type": "module",
   "description": "Export Docusaurus-generated documentation websites to PDF via CLI or Node.js API. Refactored with clean architecture, modular design, and improved error handling.",
   "main": "./src/index.js",
